@@ -81,24 +81,43 @@ app.get('/api/users/:_id/logs', async (req, res) => {
 
   try {
     const userById = await User.findById(_id);
+    if(!userById) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     const username = userById.username;
+
+    let query = { user_id: _id };
+
+    if(from || to) {
+      query.date = {};
+      if(from) {
+        query.date.$gte = new Date(from);
+      }
+      if(to) {
+        query.date.$lte = new Date(to);
+      }
+    }
+
+    let exerciseQuery = Exercise.find(query);
     
-    const exercises = await Exercise.find({ user_id: _id });
+    if(limit) {
+      exerciseQuery.limit(parseInt(limit));
+    }
+
+    const exercises = await exerciseQuery.exec();
     count = exercises.length;
 
-    const formattedLog = exercises.map(exercise => {
-      return {
+    const formattedLog = exercises.map(exercise => ({
         description: exercise.description,
         duration: exercise.duration,
         date: exercise.date ? new Date(exercise.date).toDateString() : null
-    }});
-    res.json({ _id: _id, username: username, count: count, log: formattedLog });
+    }));
+    res.json({ _id, username, from, to, count, log: formattedLog });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch exercises' });
     console.log(error);
   }
 });
-
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port);

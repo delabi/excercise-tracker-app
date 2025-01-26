@@ -21,5 +21,9 @@
 	"keywords": [
 		"node",
 		"express"
-	]
+	],
+	"devDependencies": {
+		"mocha": "^11.1.0",
+		"supertest": "^7.0.0"
+	}
 }
