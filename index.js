@@ -75,6 +75,9 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 app.get('/api/users/:_id/logs', async (req, res) => {
   const { _id } = req.params;
   const { from, to, limit } = req.query;
+  console.log("Req Query: ", req.query);
+
+  console.log("Extras:" + from, to, limit);
 
   try {
     const userById = await User.findById(_id);
