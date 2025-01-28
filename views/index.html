@@ -19,7 +19,9 @@
       <form action="/api/users/:_id/exercises" id="exercise-form" method="post">
         <h2>Add exercises</h2>
         <p><code>POST /api/users/:_id/exercises</code></p>
-        <input id="uid" type="text" name=":_id" placeholder=":_id" />
+        <select id="uid" name=":_id">
+          <option value="" disabled selected>Select user</option>
+        </select>
         <input id="desc" type="text" name="description" placeholder="description*" />
         <input id="dur" type="text" name="duration" placeholder="duration* (mins.)" />
         <input id="date" type="text" name="date" placeholder="date (yyyy-mm-dd)" />
@@ -34,6 +36,24 @@
     </div>
     <script>
       const exerciseForm = document.getElementById("exercise-form");
+      const userDropdown = document.getElementById("uid");
+
+      async function fetchUsers() {
+        try {
+          const response = await fetch('/api/users');
+          const users = await response.json();
+          users.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user._id;
+            option.textContent = user.username;
+            userDropdown.appendChild(option);
+          });
+        } catch (error) {
+          console.error('Failed to fetch users:', error);
+        }
+      }
+
+      fetchUsers();
 
       exerciseForm.addEventListener("submit", () => {
         const userId = document.getElementById("uid").value;
